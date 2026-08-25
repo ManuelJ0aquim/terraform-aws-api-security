@@ -3,7 +3,7 @@ name: IaC Pipeline - Cost Estimation
 on:
   pull_request:
     paths:
-      - "**/*.tf"
+      - '**/*.tf'
 
 jobs:
   cost-estimation:
@@ -28,7 +28,7 @@ jobs:
                               --out-file=/tmp/infracost.json
 
       - name: Postar Comentário no PR
-        uses: infracost/actions/comment@v10
+        uses: infracost/actions/comment@v1
         with:
           path: /tmp/infracost.json
           behavior: update
