@@ -37,4 +37,5 @@ resource "aws_lambda_function" "api_backend" {
   handler          = "index.lambda_handler"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   runtime          = "python3.11"
+  architectures    = ["arm64"]
 }

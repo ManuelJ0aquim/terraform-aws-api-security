@@ -1,0 +1,39 @@
+name: IaC Pipeline - Cost Estimation
+
+on:
+  pull_request:
+    paths:
+      - "**/*.tf"
+
+jobs:
+  cost-estimation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v2
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: Gerar Plano Terraform
+        run: |
+          cd infra
+          terraform init
+          terraform plan -out tfplan.binary
+          terraform show -json tfplan.binary > plan.json
+
+      - name: Gerar Breakdown de Custos
+        run: infracost breakdown --path infra/plan.json --format json --out-file infracost.json
+
+      - name: Notificar Pull Request
+        uses: infracost/actions/comment@v2
+        with:
+          path: infracost.json
+          behavior: update
