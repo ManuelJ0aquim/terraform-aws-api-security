@@ -21,7 +21,8 @@ jobs:
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      - name: Gerar Análise de Custos
+      # Gera o relatório comparando o código da branch atual com a branch principal (main)
+      - name: Gerar Análise de Custos Comparativa
         run: |
           infracost breakdown --path=infra \
                               --format=json \
@@ -32,5 +33,6 @@ jobs:
         with:
           path: /tmp/infracost.json
           behavior: update
+          show-skipped: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
