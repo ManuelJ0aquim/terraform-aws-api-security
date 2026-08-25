@@ -16,7 +16,7 @@ provider "aws" {
       Project     = "APISecurityWAF"
       Environment = var.environment
       ManagedBy   = "Terraform"
-      Service     = "api-security-service"
+      Service     = "api-security-services"
     }
   }
 }
