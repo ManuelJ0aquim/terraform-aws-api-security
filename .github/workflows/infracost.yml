@@ -3,37 +3,36 @@ name: IaC Pipeline - Cost Estimation
 on:
   pull_request:
     paths:
-      - "**/*.tf"
+      - '**/*.tf'
 
 jobs:
   cost-estimation:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_wrapper: false
 
       - name: Setup Infracost
         uses: infracost/actions/setup@v2
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      - name: Gerar Plano Terraform
+      # Gera o relatório comparando o código da branch atual com a branch principal (main)
+      - name: Gerar Análise de Custos Comparativa
         run: |
-          cd infra
-          terraform init
-          terraform plan -out tfplan.binary
-          terraform show -json tfplan.binary > plan.json
+          infracost breakdown --path=infra \
+                              --format=json \
+                              --out-file=/tmp/infracost.json
 
-      - name: Gerar Breakdown de Custos
-        run: infracost breakdown --path infra/plan.json --format json --out-file infracost.json
-
-      - name: Notificar Pull Request
-        uses: infracost/actions/comment@v2
+      - name: Postar Comentário no PR
+        uses: infracost/actions/comment@v1
         with:
-          path: infracost.json
+          path: /tmp/infracost.json
           behavior: update
+          show-skipped: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
