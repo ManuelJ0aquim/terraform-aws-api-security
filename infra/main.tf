@@ -25,3 +25,15 @@ provider "aws" {
     }
   }
 }
+# Base de dados de teste para validar o Dashboard de FinOps
+resource "aws_db_instance" "app_db" {
+  allocated_storage    = 20
+  storage_type         = "gp2"
+  engine               = "postgres"
+  engine_version       = "15.3"
+  instance_class       = "db.t3.micro"
+  db_name              = "appdb"
+  username             = "postgres"
+  password             = "PasswordMuitoSegura123!"
+  skip_final_snapshot  = true
+}
